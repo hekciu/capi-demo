@@ -4,18 +4,36 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <regex.h>
+#include <string.h>
 
 
+#define BUFFER_SIZE 4096
 #define PORT 2137
 
 void * handle_client(void * arg){
 	int client_fd = *((int *)arg);
 	
+	char * buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
 
-	int * ptr = NULL;
+	ssize_t bytes_received = recv(client_fd, buffer, BUFFER_SIZE, 0);
+
+	if (bytes_received > 0) {
+		regex_t regex;
+		regcomp(&regex, "^GET /([^ ]*) HTTP/1", REG_EXTENDED);
+		regmatch_t matches[2];
+
+		int reti = regexec(&regex, buffer, 2, matches, 0);
+
+		if (reti == 0) {
+			char * response = "Hello from C socket";
+			send(client_fd, response, strlen(response), 0);
+		}
+
+		regfree(&regex);
+	}
 	
-	free(client_fd);
-	return (void *)ptr;
+	free(buffer);
 };
 
 int main() {
