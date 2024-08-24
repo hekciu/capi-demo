@@ -13,6 +13,8 @@ void * handle_client(void * arg){
 	
 
 	int * ptr = NULL;
+	
+	free(client_fd);
 	return (void *)ptr;
 };
 
@@ -60,7 +62,6 @@ int main() {
 		pthread_t thread_id;
 		pthread_create(&thread_id, NULL, &handle_client, (void *)client_fd);
 		pthread_detach(thread_id);
-		free(client_fd);
 	}
 
 	return 0;
