@@ -11,7 +11,12 @@
 #define BUFFER_SIZE 4096
 #define PORT 2137
 
+size_t build_http_response(char * response) {
+    return 0;    
+}
+
 void * handle_client(void * arg){
+    printf("handle_client function called\n");
 	int client_fd = *((int *)arg);
 	
 	char * buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
@@ -25,9 +30,12 @@ void * handle_client(void * arg){
 
 		int reti = regexec(&regex, buffer, 2, matches, 0);
 
+        printf("got something\n");
 		if (reti == 0) {
-			char * response = "Hello from C socket";
-			send(client_fd, response, strlen(response), 0);
+			char * response = NULL;
+            printf("got http request\n");
+            size_t responseSize = build_http_response(response);
+			send(client_fd, response, responseSize, 0);
 		}
 
 		regfree(&regex);
@@ -48,7 +56,7 @@ int main() {
 	}
 
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = PORT;
+	server_addr.sin_port = htons(PORT);
 	server_addr.sin_addr.s_addr = htons(INADDR_ANY);
 
 	int bind_result = bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
