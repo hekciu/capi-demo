@@ -6,13 +6,18 @@
 #include <pthread.h>
 #include <regex.h>
 #include <string.h>
+#include <unistd.h>
 
 
 #define BUFFER_SIZE 4096
 #define PORT 2137
 
 size_t build_http_response(char * response) {
-    return 0;    
+    char * stringOrSomething = "HTTP/1.1 200 OK \r\n Hello from GNU/Linux C socket program";
+    size_t length = strlen(stringOrSomething);
+    response = malloc(length);
+    memcpy(response, stringOrSomething, length);
+    return length;    
 }
 
 void * handle_client(void * arg){
@@ -36,6 +41,10 @@ void * handle_client(void * arg){
             printf("got http request\n");
             size_t responseSize = build_http_response(response);
 			send(client_fd, response, responseSize, 0);
+            if (response != NULL) {
+                free(response);
+            }
+            close(client_fd);
 		}
 
 		regfree(&regex);
@@ -86,7 +95,7 @@ int main() {
 		}
 
 		pthread_t thread_id;
-		pthread_create(&thread_id, NULL, &handle_client, (void *)client_fd);
+		pthread_create(&thread_id, NULL, handle_client, (void *)client_fd);
 		pthread_detach(thread_id);
 	}
 
