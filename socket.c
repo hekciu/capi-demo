@@ -12,12 +12,17 @@
 #define BUFFER_SIZE 4096
 #define PORT 2137
 
-size_t build_http_response(char * response) {
-    char * stringOrSomething = "HTTP/1.1 200 OK \r\n Hello from GNU/Linux C socket program";
-    size_t length = strlen(stringOrSomething);
-    response = malloc(length);
-    memcpy(response, stringOrSomething, length);
-    return length;    
+size_t build_http_response(char ** response) {
+    char * responseStart = "HTTP/1.1 200 OK \r\n";
+    char * headers =
+        "Content-Type: text/html; charset=utf-8\r\n"
+        "Accept-Ranges: bytes\r\n"
+        "Connection: keep-alive\r\n\r\n";
+    char * stringOrSomething = "Hello from GNU/Linux C socket program";
+    size_t length = strlen(responseStart) + strlen(headers) + strlen(stringOrSomething) + 1;
+    *response = malloc(length);
+    int lengthWithoutNull = snprintf(*response, length, "%s%s%s", responseStart, headers, stringOrSomething);
+    return (size_t)lengthWithoutNull;    
 }
 
 void * handle_client(void * arg){
@@ -39,7 +44,7 @@ void * handle_client(void * arg){
 		if (reti == 0) {
 			char * response = NULL;
             printf("got http request\n");
-            size_t responseSize = build_http_response(response);
+            size_t responseSize = build_http_response(&response);
 			send(client_fd, response, responseSize, 0);
             if (response != NULL) {
                 free(response);

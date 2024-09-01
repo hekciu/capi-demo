@@ -1,2 +1,2 @@
-thing: main.c
-	gcc main.c -o thing -lc -lpthread
+server: socket.c
+	gcc socket.c -o server -lc -lpthread
