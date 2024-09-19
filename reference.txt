@@ -1,1 +1,7 @@
 sudo apt install libpq-dev
+
+// for enabling remote connections:
+https://tecadmin.net/postgresql-allow-remote-connections/
+
+^ this one but in pg_hba.conf
+change literally all ip addresses to 0.0.0.0/0 or ::0/0
